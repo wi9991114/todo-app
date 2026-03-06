@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TODO App</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #2c3e50;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 680px;
+        }
+
+        .app-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 28px;
+            letter-spacing: 0.5px;
+        }
+
+        .app-title span {
+            color: #4a90d9;
+        }
+
+        .input-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .task-input {
+            flex: 1;
+            border: 1.5px solid #dde3ec;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.97rem;
+            color: #2c3e50;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #f8fafd;
+        }
+
+        .task-input:focus {
+            border-color: #4a90d9;
+            background: #fff;
+        }
+
+        .add-button {
+            background: #4a90d9;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 22px;
+            font-size: 0.97rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        .add-button:hover {
+            background: #357abd;
+        }
+
+        .add-button:active {
+            transform: scale(0.97);
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .select-all-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #5a6a7a;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .select-all-label input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            accent-color: #4a90d9;
+            cursor: pointer;
+        }
+
+        .delete-completed-button {
+            background: #fff;
+            color: #e05c5c;
+            border: 1.5px solid #e05c5c;
+            border-radius: 8px;
+            padding: 7px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .delete-completed-button:hover {
+            background: #e05c5c;
+            color: #fff;
+        }
+
+        .tabs-section {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1.5px solid #eef1f6;
+        }
+
+        .tab-button {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 14px 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #7a8a9a;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: color 0.2s, background 0.2s;
+            border-bottom: 2.5px solid transparent;
+            margin-bottom: -1.5px;
+        }
+
+        .tab-button:hover {
+            color: #4a90d9;
+            background: #f6f9fd;
+        }
+
+        .tab-button.active {
+            color: #4a90d9;
+            border-bottom-color: #4a90d9;
+            font-weight: 700;
+        }
+
+        .tab-count {
+            background: #eef1f6;
+            color: #5a6a7a;
+            border-radius: 20px;
+            padding: 1px 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .tab-button.active .tab-count {
+            background: #4a90d9;
+            color: #fff;
+        }
+
+        .tasks-list {
+            list-style: none;
+            padding: 8px 0;
+            min-height: 60px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 20px;
+            border-bottom: 1px solid #f0f2f5;
+            transition: background 0.15s;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item:hover {
+            background: #f8fafd;
+        }
+
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #4a90d9;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 0.96rem;
+            color: #2c3e50;
+            cursor: pointer;
+            word-break: break-word;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.15s;
+            line-height: 1.5;
+        }
+
+        .task-text:hover {
+            background: #eef4fc;
+        }
+
+        .task-text.completed-text {
+            color: #a0aab4;
+            text-decoration: line-through;
+        }
+
+        .task-edit-input {
+            flex: 1;
+            border: 1.5px solid #4a90d9;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 0.96rem;
+            color: #2c3e50;
+            outline: none;
+            background: #f0f7ff;
+        }
+
+        .task-delete-button {
+            background: none;
+            border: none;
+            color: #c0cad6;
+            font-size: 1.15rem;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .task-delete-button:hover {
+            color: #e05c5c;
+            background: #fdeaea;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #a0aab4;
+            font-size: 0.93rem;
+            padding: 36px 20px;
+        }
+
+        .pagination-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 16px 20px;
+            border-top: 1px solid #eef1f6;
+            flex-wrap: wrap;
+        }
+
+        .page-button {
+            background: #f4f7fb;
+            border: 1.5px solid #dde3ec;
+            border-radius: 7px;
+            padding: 6px 13px;
+            font-size: 0.88rem;
+            color: #5a6a7a;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        .page-button:hover {
+            background: #4a90d9;
+            color: #fff;
+            border-color: #4a90d9;
+        }
+
+        .page-button.active-page {
+            background: #4a90d9;
+            color: #fff;
+            border-color: #4a90d9;
+        }
+
+        .page-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.5rem;
+            }
+            .input-section {
+                flex-direction: column;
+            }
+            .add-button {
+                width: 100%;
+            }
+            .task-item {
+                padding: 11px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1 class="app-title"> <span>TODO</span></h1>
+
+        <div class="input-section">
+            <input
+                type="text"
+                id="taskInput"
+                class="task-input"
+                placeholder="Введите задачу..."
+                maxlength="250"
+            />
+            <button id="addButton" class="add-button">Добавить</button>
+        </div>
+
+        <div class="toolbar">
+            <label class="select-all-label">
+                <input type="checkbox" id="selectAllCheckbox" />
+                Выбрать все
+            </label>
+            <button id="deleteCompletedButton" class="delete-completed-button">
+                🗑 Удалить выполненные
+            </button>
+        </div>
+
+        <div class="tabs-section">
+            <div class="tabs-header">
+                <button class="tab-button active" data-filter="all" id="tabAll">
+                    Все <span class="tab-count" id="countAll">0</span>
+                </button>
+                <button class="tab-button" data-filter="active" id="tabActive">
+                    Активные <span class="tab-count" id="countActive">0</span>
+                </button>
+                <button class="tab-button" data-filter="completed" id="tabCompleted">
+                    Завершённые <span class="tab-count" id="countCompleted">0</span>
+                </button>
+            </div>
+
+            <ul class="tasks-list" id="tasksList"></ul>
+
+            <div class="pagination-section" id="paginationSection"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = "http://localhost:3000";
+        const TASKS_PER_PAGE = 5;
+
+        let currentFilter = "all";
+        let currentPage = 1;
+        let totalTasks = 0;
+
+        const taskInputElement = document.getElementById("taskInput");
+        const addButtonElement = document.getElementById("addButton");
+        const selectAllCheckboxElement = document.getElementById("selectAllCheckbox");
+        const deleteCompletedButtonElement = document.getElementById("deleteCompletedButton");
+        const tasksListElement = document.getElementById("tasksList");
+        const paginationSectionElement = document.getElementById("paginationSection");
+        const countAllElement = document.getElementById("countAll");
+        const countActiveElement = document.getElementById("countActive");
+        const countCompletedElement = document.getElementById("countCompleted");
+
+        function fetchTasks() {
+            const url = API_BASE_URL + "/tasks?filter=" + currentFilter + "&page=" + currentPage + "&limit=" + TASKS_PER_PAGE;
+            fetch(url)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    totalTasks = data.total;
+                    renderTasksList(data.tasks);
+                    renderPagination();
+                })
+                .catch(function(error) {
+                    console.error("Error fetching tasks:", error);
+                });
+        }
+
+        function fetchCounters() {
+            const allUrl = API_BASE_URL + "/tasks?filter=all&page=1&limit=1";
+            const activeUrl = API_BASE_URL + "/tasks?filter=active&page=1&limit=1";
+            const completedUrl = API_BASE_URL + "/tasks?filter=completed&page=1&limit=1";
+
+            Promise.all([
+                fetch(allUrl).then(function(r) { return r.json(); }),
+                fetch(activeUrl).then(function(r) { return r.json(); }),
+                fetch(completedUrl).then(function(r) { return r.json(); })
+            ]).then(function(results) {
+                countAllElement.innerHTML = results[0].total;
+                countActiveElement.innerHTML = results[1].total;
+                countCompletedElement.innerHTML = results[2].total;
+            }).catch(function(error) {
+                console.error("Error fetching counters:", error);
+            });
+        }
+
+        function refreshAll() {
+            fetchTasks();
+            fetchCounters();
+        }
+
+        function renderTasksList(tasks) {
+            tasksListElement.innerHTML = "";
+
+            if (tasks.length === 0) {
+                const emptyItem = document.createElement("li");
+                emptyItem.className = "empty-message";
+                emptyItem.innerHTML = "Нет задач";
+                tasksListElement.appendChild(emptyItem);
+                return;
+            }
+
+            tasks.forEach(function(task) {
+                const listItem = document.createElement("li");
+                listItem.className = "task-item";
+                listItem.setAttribute("data-id", task.id);
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "task-checkbox";
+                checkbox.checked = task.completed == 1;
+                checkbox.addEventListener("change", function() {
+                    handleTaskCompletedToggle(task.id, checkbox.checked);
+                });
+
+                const textSpan = document.createElement("span");
+                textSpan.className = "task-text" + (task.completed == 1 ? " completed-text" : "");
+                textSpan.innerHTML = task.text;
+                textSpan.addEventListener("click", function() {
+                    handleTaskTextClick(task.id, task.text, listItem, textSpan);
+                });
+
+                const deleteButton = document.createElement("button");
+                deleteButton.className = "task-delete-button";
+                deleteButton.innerHTML = "✕";
+                deleteButton.title = "Удалить задачу";
+                deleteButton.addEventListener("click", function() {
+                    handleDeleteTask(task.id);
+                });
+
+                listItem.appendChild(checkbox);
+                listItem.appendChild(textSpan);
+                listItem.appendChild(deleteButton);
+                tasksListElement.appendChild(listItem);
+            });
+        }
+
+        function renderPagination() {
+            paginationSectionElement.innerHTML = "";
+            const totalPages = Math.ceil(totalTasks / TASKS_PER_PAGE);
+
+            if (totalPages <= 1) {
+                return;
+            }
+
+            const prevButton = document.createElement("button");
+            prevButton.className = "page-button";
+            prevButton.innerHTML = "← Назад";
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener("click", function() {
+                if (currentPage > 1) {
+                    currentPage = currentPage - 1;
+                    refreshAll();
+                }
+            });
+            paginationSectionElement.appendChild(prevButton);
+
+            for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+                const pageButton = document.createElement("button");
+                pageButton.className = "page-button" + (pageNumber === currentPage ? " active-page" : "");
+                pageButton.innerHTML = pageNumber;
+                pageButton.addEventListener("click", function() {
+                    currentPage = pageNumber;
+                    refreshAll();
+                });
+                paginationSectionElement.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement("button");
+            nextButton.className = "page-button";
+            nextButton.innerHTML = "Вперёд →";
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.addEventListener("click", function() {
+                if (currentPage < totalPages) {
+                    currentPage = currentPage + 1;
+                    refreshAll();
+                }
+            });
+            paginationSectionElement.appendChild(nextButton);
+        }
+
+        function handleAddTask() {
+            const taskText = taskInputElement.value;
+            if (taskText.trim() === "") {
+                taskInputElement.focus();
+                return;
+            }
+
+            fetch(API_BASE_URL + "/tasks", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: taskText, completed: false })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function() {
+                taskInputElement.value = "";
+                currentPage = 1;
+                currentFilter = "all";
+                setActiveTab("all");
+                refreshAll();
+                taskInputElement.focus();
+            })
+            .catch(function(error) {
+                console.error("Error adding task:", error);
+            });
+        }
+
+        function handleTaskCompletedToggle(taskId, isCompleted) {
+            fetch(API_BASE_URL + "/tasks/" + taskId, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ completed: isCompleted })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function() {
+                const totalPages = Math.ceil(totalTasks / TASKS_PER_PAGE);
+                if (currentPage > totalPages && totalPages > 0) {
+                    currentPage = totalPages;
+                }
+                refreshAll();
+            })
+            .catch(function(error) {
+                console.error("Error updating task:", error);
+            });
+        }
+
+        function handleTaskTextClick(taskId, originalText, listItem, textSpan) {
+            const editInput = document.createElement("input");
+            editInput.type = "text";
+            editInput.className = "task-edit-input";
+            editInput.value = originalText;
+            editInput.maxLength = 250;
+
+            listItem.replaceChild(editInput, textSpan);
+            editInput.focus();
+            editInput.select();
+
+            function saveEdit() {
+                const newText = editInput.value;
+                if (newText.trim() === "") {
+                    cancelEdit();
+                    return;
+                }
+                fetch(API_BASE_URL + "/tasks/" + taskId, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: newText })
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function() {
+                    refreshAll();
+                })
+                .catch(function(error) {
+                    console.error("Error editing task:", error);
+                });
+            }
+
+            function cancelEdit() {
+                listItem.replaceChild(textSpan, editInput);
+            }
+
+            editInput.addEventListener("blur", saveEdit);
+
+            editInput.addEventListener("keydown", function(event) {
+                if (event.key === "Enter") {
+                    editInput.removeEventListener("blur", saveEdit);
+                    saveEdit();
+                } else if (event.key === "Escape") {
+                    editInput.removeEventListener("blur", saveEdit);
+                    cancelEdit();
+                }
+            });
+        }
+
+        function handleDeleteTask(taskId) {
+            fetch(API_BASE_URL + "/tasks/" + taskId, {
+                method: "DELETE"
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function() {
+                const totalPages = Math.ceil((totalTasks - 1) / TASKS_PER_PAGE);
+                if (currentPage > totalPages && totalPages > 0) {
+                    currentPage = totalPages;
+                }
+                refreshAll();
+            })
+            .catch(function(error) {
+                console.error("Error deleting task:", error);
+            });
+        }
+
+        function handleDeleteCompleted() {
+            fetch(API_BASE_URL + "/tasks/completed", {
+                method: "DELETE"
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function() {
+                currentPage = 1;
+                refreshAll();
+            })
+            .catch(function(error) {
+                console.error("Error deleting completed tasks:", error);
+            });
+        }
+
+        function handleSelectAll() {
+            const isChecked = selectAllCheckboxElement.checked;
+
+            fetch(API_BASE_URL + "/tasks?filter=all&page=1&limit=10000")
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    const allTasks = data.tasks;
+                    const updatePromises = allTasks.map(function(task) {
+                        return fetch(API_BASE_URL + "/tasks/" + task.id, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ completed: isChecked })
+                        }).then(function(r) { return r.json(); });
+                    });
+                    return Promise.all(updatePromises);
+                })
+                .then(function() {
+                    refreshAll();
+                })
+                .catch(function(error) {
+                    console.error("Error in select all:", error);
+                });
+        }
+
+        function setActiveTab(filterValue) {
+            const tabButtons = document.querySelectorAll(".tab-button");
+            tabButtons.forEach(function(button) {
+                button.classList.remove("active");
+                if (button.getAttribute("data-filter") === filterValue) {
+                    button.classList.add("active");
+                }
+            });
+        }
+
+        addButtonElement.addEventListener("click", handleAddTask);
+
+        taskInputElement.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                handleAddTask();
+            } else if (event.key === "Escape") {
+                taskInputElement.value = "";
+            }
+        });
+
+        deleteCompletedButtonElement.addEventListener("click", handleDeleteCompleted);
+
+        selectAllCheckboxElement.addEventListener("change", handleSelectAll);
+
+        const tabButtonElements = document.querySelectorAll(".tab-button");
+        tabButtonElements.forEach(function(button) {
+            button.addEventListener("click", function() {
+                currentFilter = button.getAttribute("data-filter");
+                currentPage = 1;
+                setActiveTab(currentFilter);
+                refreshAll();
+            });
+        });
+
+        refreshAll();
+    </script>
+</body>
+</html>
